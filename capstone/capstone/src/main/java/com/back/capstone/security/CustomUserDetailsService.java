@@ -1,0 +1,3 @@
+package com.back.capstone.security;
+import com.back.capstone.repository.UserRepository; import org.springframework.security.core.userdetails.*; import org.springframework.stereotype.Service;
+@Service public class CustomUserDetailsService implements UserDetailsService { private final UserRepository users; public CustomUserDetailsService(UserRepository users){this.users=users;} public UserDetails loadUserByUsername(String u){var user=users.findByUsername(u).orElseThrow(()->new UsernameNotFoundException("User not found"));return User.withUsername(user.getUsername()).password(user.getPassword()).authorities("USER").build();}}

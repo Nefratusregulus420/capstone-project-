@@ -1,0 +1,3 @@
+package com.back.capstone.controller;
+import com.back.capstone.dto.AuthDtos.*;import com.back.capstone.service.UserService;import jakarta.validation.Valid;import org.springframework.http.*;import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/api/auth") public class AuthController {private final UserService users;public AuthController(UserService u){users=u;}@PostMapping("/register") ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest r){return ResponseEntity.status(HttpStatus.CREATED).body(users.register(r));}@PostMapping("/login") AuthResponse login(@Valid @RequestBody LoginRequest r){return users.login(r);}}

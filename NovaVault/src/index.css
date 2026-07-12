@@ -1,0 +1,15 @@
+/* index.css */
+
+/* Reset default margin/padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Remove the white background */
+body {
+  background-color: transparent; /* or any color you prefer */
+  font-family: sans-serif;       /* optional: set your font */
+  min-height: 100vh;
+}

@@ -1,0 +1,187 @@
+.files-empty-state {
+  display: flex;
+  min-height: 315px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 42px 20px;
+  border: 1px dashed #cbdbee;
+  border-radius: 12px;
+  color: #8aa0ad;
+  text-align: center;
+  background: linear-gradient(135deg, #fcfdff, #f5f9fc);
+}
+
+.files-empty-state > strong {
+  display: block;
+  color: #384d67;
+  font-size: 16px;
+}
+
+.files-empty-state > p {
+  max-width: 330px;
+  margin: 7px 0 19px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #8aa0ad;
+}
+
+.files-empty-state .empty-illustration {
+  position: relative;
+  width: 116px;
+  height: 92px;
+  margin-bottom: 19px;
+  animation: empty-float 3.6s ease-in-out infinite;
+}
+
+.files-empty-state .illustration-sheet {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 76px;
+  border-radius: 12px;
+}
+
+.files-empty-state .sheet-back {
+  top: 6px;
+  left: 17px;
+  background: #e9f7ff;
+  transform: rotate(-12deg);
+}
+
+.files-empty-state .sheet-front {
+  top: 2px;
+  left: 29px;
+  color: #fff;
+  background: linear-gradient(145deg, #168fcb, #5ec3f5);
+  box-shadow: 0 12px 25px rgba(22, 143, 203, 0.25);
+  transform: rotate(8deg);
+}
+
+.files-empty-state .sheet-front svg {
+  margin: 0;
+  font-size: 25px;
+  color: #fff;
+}
+
+.files-empty-state .illustration-spark {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.files-empty-state .spark-one {
+  top: 4px;
+  right: 8px;
+  background: #168fcb;
+  animation: sparkle 2.2s ease-in-out infinite;
+}
+
+.files-empty-state .spark-two {
+  bottom: 8px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  background: #5ec3f5;
+  animation: sparkle 2.2s .7s ease-in-out infinite;
+}
+
+.files-empty-state .empty-upload-button {
+  border: 0;
+  border-radius: 7px;
+  padding: 10px 14px;
+  color: #fff;
+  background: linear-gradient(115deg, #168fcb, #5ec3f5);
+  box-shadow: 0 7px 15px rgba(22, 143, 203, 0.22);
+  cursor: pointer;
+  font: 600 12px 'Poppins', sans-serif;
+  transition: .3s;
+}
+
+.files-empty-state .empty-upload-button svg {
+  margin: 0 7px 0 0;
+}
+
+.files-empty-state .empty-upload-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 20px rgba(22, 143, 203, 0.32);
+}
+
+/* Stored Files List Styling */
+.stored-files-container {
+  padding: 10px 0;
+  animation: modal-rise-in 0.3s ease-out;
+}
+
+.stored-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-row-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 13px 16px;
+  border: 1px solid #edf1f3;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.file-row-item:hover {
+  border-color: #cbdbee;
+  background: #f7faff;
+}
+
+.file-icon-wrapper {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  font-size: 17px;
+  color: #168fcb;
+  background: #e9f7ff;
+}
+
+.file-row-info {
+  flex: 1;
+  min-width: 0; /* Ensures truncation works properly */
+}
+
+.file-row-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e3343;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-row-meta {
+  font-size: 11px;
+  color: #91a0ae;
+  margin: 4px 0 0 0;
+}
+
+.file-row-actions-btn {
+  padding: 8px;
+  border-radius: 8px;
+  background: transparent;
+  color: #8aa0ad;
+  border: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.file-row-actions-btn:hover {
+  color: #168fcb;
+  background: #e9f7ff;
+}

@@ -1,0 +1,222 @@
+.photos-empty-state {
+  display: flex;
+  min-height: 315px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 42px 20px;
+  border: 1px dashed #e2cceb;
+  border-radius: 12px;
+  color: #8aa0ad;
+  text-align: center;
+  background: linear-gradient(135deg, #fdfcff, #f9f5fc);
+}
+
+.photos-empty-state > strong {
+  display: block;
+  color: #384d67;
+  font-size: 16px;
+}
+
+.photos-empty-state > p {
+  max-width: 330px;
+  margin: 7px 0 19px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #8aa0ad;
+}
+
+.photos-empty-state .empty-illustration {
+  position: relative;
+  width: 116px;
+  height: 92px;
+  margin-bottom: 19px;
+  animation: empty-float 3.6s ease-in-out infinite;
+}
+
+.photos-empty-state .illustration-sheet {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 76px;
+  border-radius: 12px;
+}
+
+.photos-empty-state .sheet-back {
+  top: 6px;
+  left: 17px;
+  background: #f6ecff;
+  transform: rotate(-12deg);
+}
+
+.photos-empty-state .sheet-front {
+  top: 2px;
+  left: 29px;
+  color: #fff;
+  background: linear-gradient(145deg, #b273d0, #d79ef2);
+  box-shadow: 0 12px 25px rgba(178, 115, 208, 0.25);
+  transform: rotate(8deg);
+}
+
+.photos-empty-state .sheet-front svg {
+  margin: 0;
+  font-size: 25px;
+  color: #fff;
+}
+
+.photos-empty-state .illustration-spark {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.photos-empty-state .spark-one {
+  top: 4px;
+  right: 8px;
+  background: #b273d0;
+  animation: sparkle 2.2s ease-in-out infinite;
+}
+
+.photos-empty-state .spark-two {
+  bottom: 8px;
+  left: 4px;
+  width: 6px;
+  height: 6px;
+  background: #d79ef2;
+  animation: sparkle 2.2s .7s ease-in-out infinite;
+}
+
+.photos-empty-state .empty-upload-button {
+  border: 0;
+  border-radius: 7px;
+  padding: 10px 14px;
+  color: #fff;
+  background: linear-gradient(115deg, #b273d0, #d79ef2);
+  box-shadow: 0 7px 15px rgba(178, 115, 208, 0.22);
+  cursor: pointer;
+  font: 600 12px 'Poppins', sans-serif;
+  transition: .3s;
+}
+
+.photos-empty-state .empty-upload-button svg {
+  margin: 0 7px 0 0;
+}
+
+.photos-empty-state .empty-upload-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 20px rgba(178, 115, 208, 0.32);
+}
+
+/* Stored Photos Grid Styling */
+.stored-photos-container {
+  padding: 10px 0;
+  animation: modal-rise-in 0.3s ease-out;
+}
+
+.stored-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.photo-card {
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #edf1f3;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.photo-card:hover {
+  transform: translateY(-4px);
+  border-color: #dcbceb;
+  box-shadow: 0 12px 24px rgba(178, 115, 208, 0.08);
+}
+
+.photo-thumbnail {
+  position: relative;
+  aspect-ratio: 4/3;
+  background: #faf6fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid #f6ecff;
+}
+
+.photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.photo-card:hover .photo-img {
+  transform: scale(1.05);
+}
+
+.photo-placeholder {
+  color: #d1b2e6;
+  font-size: 32px;
+  display: grid;
+  place-items: center;
+}
+
+.photo-actions-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #8aa0ad;
+  border: 0;
+  cursor: pointer;
+  opacity: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.photo-card:hover .photo-actions-btn {
+  opacity: 1;
+}
+
+.photo-actions-btn:hover {
+  background: #b273d0;
+  color: #fff;
+}
+
+.photo-details {
+  padding: 12px;
+  background: #fff;
+}
+
+.photo-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e3343;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.photo-meta {
+  font-size: 11px;
+  color: #91a0ae;
+  margin: 4px 0 0 0;
+}
+
+@media (max-width: 480px) {
+  .stored-photos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+}
