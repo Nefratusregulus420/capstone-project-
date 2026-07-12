@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,13 +14,15 @@ import {
   FaRegBell,
   FaXmark,
   FaHeart,
-  FaImages
+  FaImages,
+  FaTrash,
 } from "react-icons/fa6";
 import "./PhotosGallery.css";
 import logo from "../../assets/images/logo.png";
 import type { RecentUpload } from "../../App";
 import { fileService } from "../../services/services";
 import { useAuth } from "../../auth";
+import { revokeRecentUploadUrls, toRecentUpload } from "../../services/fileMapper";
 
 const formatFileSize = (bytes: number) =>
   bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -40,7 +42,22 @@ const PhotosGallery = ({ recentUploads, setRecentUploads }: PhotosGalleryProps) 
   const [activeGalleryTab, setActiveGalleryTab] = useState<GalleryTab>("All");
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    fileService.list("PHOTO")
+      .then((files) => Promise.all(files.map(toRecentUpload)))
+      .then((files) => {
+        if (active) setRecentUploads((current) => {
+          revokeRecentUploadUrls(current);
+          return files;
+        });
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [setRecentUploads]);
 
   // Filter only photos that match search query
   const photos = useMemo(() => {
@@ -49,10 +66,39 @@ const PhotosGallery = ({ recentUploads, setRecentUploads }: PhotosGalleryProps) 
     );
   }, [recentUploads, query]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      await fileService.remove(parseInt(id));
+      setRecentUploads((current) => {
+        const updated = current.filter((f) => f.id !== id);
+        revokeRecentUploadUrls(current.filter((f) => f.id === id));
+        return updated;
+      });
+    } catch (error) {
+      console.error("Failed to delete file:", error);
+    }
+  };
+
+  const handleMenuToggle = (id: string) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
+
+  const handleDeleteConfirm = (id: string, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+      handleDelete(id);
+    }
+    setOpenMenuId(null);
+  };
+
   const openFilePicker = () => fileInputRef.current?.click();
   
   const addRecentUploads = async (files: File[]) => {
-    await fileService.upload(files);
+    const uploaded = await fileService.upload(files);
+    const persisted = await Promise.all(uploaded.map(toRecentUpload));
+    setRecentUploads((current) => [...persisted, ...current]);
+    setIsUploadModalOpen(false);
+    return;
     setRecentUploads((current) => [
       ...files.map((file) => ({
         id: `${file.name}-${file.lastModified}-${file.size}-${Date.now()}`,
@@ -164,26 +210,43 @@ const PhotosGallery = ({ recentUploads, setRecentUploads }: PhotosGalleryProps) 
                     <h2 className="timeline-date-header">Recently Uploaded</h2>
                     <div className="photos-masonry-grid">
                       {photos.map((photo) => (
-                        <article className="photo-gallery-card" key={photo.id}>
-                          <div className="photo-card-wrapper">
-                            {photo.url ? (
-                              <img src={photo.url} alt={photo.name} className="photo-gallery-img" />
-                            ) : (
-                              <div className="photo-gallery-placeholder">
-                                <FaImage />
-                              </div>
-                            )}
-                            <div className="photo-card-hover-overlay">
-                              <button className="photo-action-btn" aria-label="Favorite"><FaHeart /></button>
-                              <button className="photo-action-btn" aria-label="More options"><FaEllipsisVertical /></button>
-                            </div>
+                    <article className="photo-gallery-card" key={photo.id}>
+                      <div className="photo-card-wrapper">
+                        {photo.url ? (
+                          <img src={photo.url} alt={photo.name} className="photo-gallery-img" />
+                        ) : (
+                          <div className="photo-gallery-placeholder">
+                            <FaImage />
                           </div>
-                          <div className="photo-card-meta-details">
-                            <span className="photo-meta-name" title={photo.name}>{photo.name}</span>
-                            <span className="photo-meta-size">{photo.meta}</span>
+                        )}
+                        <div className="photo-card-hover-overlay">
+                          <button className="photo-action-btn" aria-label="Favorite"><FaHeart /></button>
+                          <button
+                            className="photo-action-btn"
+                            aria-label="More options"
+                            onClick={() => handleMenuToggle(photo.id)}
+                          >
+                            <FaEllipsisVertical />
+                          </button>
+                        </div>
+                        {openMenuId === photo.id && (
+                          <div className="gallery-dropdown-menu" role="menu">
+                            <button
+                              className="dropdown-menu-item delete-item"
+                              role="menuitem"
+                              onClick={(e) => handleDeleteConfirm(photo.id, photo.name, e)}
+                            >
+                              <FaTrash /> Delete
+                            </button>
                           </div>
-                        </article>
-                      ))}
+                        )}
+                      </div>
+                      <div className="photo-card-meta-details">
+                        <span className="photo-meta-name" title={photo.name}>{photo.name}</span>
+                        <span className="photo-meta-size">{photo.meta}</span>
+                      </div>
+                    </article>
+                  ))}
                     </div>
                   </div>
                 </div>

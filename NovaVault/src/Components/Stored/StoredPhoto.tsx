@@ -1,4 +1,5 @@
-import { FaImage, FaEllipsisVertical, FaArrowUpFromBracket } from "react-icons/fa6";
+import { useState } from "react";
+import { FaImage, FaEllipsisVertical, FaArrowUpFromBracket, FaTrash } from "react-icons/fa6";
 import "./StoredPhoto.css";
 
 type PhotoFile = {
@@ -12,9 +13,12 @@ type PhotoFile = {
 interface StoredPhotosProps {
   photos: PhotoFile[];
   onUploadClick: () => void;
+  onDelete: (id: string) => void;
 }
 
-const StoredPhotos = ({ photos, onUploadClick }: StoredPhotosProps) => {
+const StoredPhotos = ({ photos, onUploadClick, onDelete }: StoredPhotosProps) => {
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
   if (photos.length === 0) {
     return (
       <div className="photos-empty-state">
@@ -35,6 +39,18 @@ const StoredPhotos = ({ photos, onUploadClick }: StoredPhotosProps) => {
     );
   }
 
+  const handleMenuToggle = (id: string) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
+
+  const handleDelete = (id: string, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+      onDelete(id);
+    }
+    setOpenMenuId(null);
+  };
+
   return (
     <div className="stored-photos-container">
       <div className="stored-photos-grid">
@@ -48,9 +64,24 @@ const StoredPhotos = ({ photos, onUploadClick }: StoredPhotosProps) => {
                   <FaImage />
                 </div>
               )}
-              <button className="photo-actions-btn" aria-label={`More options for ${photo.name}`}>
+              <button
+                className="photo-actions-btn"
+                aria-label={`More options for ${photo.name}`}
+                onClick={() => handleMenuToggle(photo.id)}
+              >
                 <FaEllipsisVertical />
               </button>
+              {openMenuId === photo.id && (
+                <div className="photo-dropdown-menu" role="menu">
+                  <button
+                    className="dropdown-menu-item delete-item"
+                    role="menuitem"
+                    onClick={(e) => handleDelete(photo.id, photo.name, e)}
+                  >
+                    <FaTrash /> Delete
+                  </button>
+                </div>
+              )}
             </div>
             <div className="photo-details">
               <h3 className="photo-name" title={photo.name}>{photo.name}</h3>

@@ -214,6 +214,60 @@
   margin: 4px 0 0 0;
 }
 
+/* Dropdown Menu Styles */
+.photo-dropdown-menu, .file-dropdown-menu, .gallery-dropdown-menu, .dropdown-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 150px;
+  padding: 6px;
+  border: 1px solid #dceae8;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(24, 62, 72, .18);
+  animation: menu-in .16s ease-out;
+}
+
+.dropdown-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font: 500 12px 'Poppins', sans-serif;
+  text-align: left;
+  transition: .2s;
+}
+
+.dropdown-menu-item:hover {
+  background: #effbf7;
+}
+
+.dropdown-menu-item.delete-item {
+  color: #c65360;
+}
+
+.dropdown-menu-item.delete-item:hover {
+  color: #b53f4d;
+  background: #fff1f2;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 480px) {
   .stored-photos-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

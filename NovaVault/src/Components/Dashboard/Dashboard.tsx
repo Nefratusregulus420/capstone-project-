@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
@@ -14,6 +14,7 @@ import {
   FaRegBell,
   FaTableCellsLarge,
   FaXmark,
+  FaTrash,
 } from "react-icons/fa6";
 import "./Dashboard.css";
 import logo from "../../assets/images/logo.png";
@@ -22,6 +23,7 @@ import StoredFiles from "../Stored/StoredFiles";
 import type { RecentUpload } from "../../App";
 import { fileService } from "../../services/services";
 import { useAuth } from "../../auth";
+import { revokeRecentUploadUrls, toRecentUpload } from "../../services/fileMapper";
 
 const formatFileSize = (bytes: number) =>
   bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -39,8 +41,23 @@ const Dashboard = ({ recentUploads, setRecentUploads }: DashboardProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let active = true;
+    fileService.list()
+      .then((files) => Promise.all(files.map(toRecentUpload)))
+      .then((files) => {
+        if (active) setRecentUploads((current) => {
+          revokeRecentUploadUrls(current);
+          return files;
+        });
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, [setRecentUploads]);
 
   const visibleUploads = useMemo(() => {
     const filterType = currentView === "Photos" ? "Photos" : currentView === "Files" ? "Files" : "All";
@@ -49,9 +66,38 @@ const Dashboard = ({ recentUploads, setRecentUploads }: DashboardProps) => {
     );
   }, [currentView, query, recentUploads]);
 
+  const handleDelete = async (id: string) => {
+    try {
+      await fileService.remove(parseInt(id));
+      setRecentUploads((current) => {
+        const updated = current.filter((f) => f.id !== id);
+        revokeRecentUploadUrls(current.filter((f) => f.id === id));
+        return updated;
+      });
+    } catch (error) {
+      console.error("Failed to delete file:", error);
+    }
+  };
+
+  const handleMenuToggle = (id: string) => {
+    setOpenMenuId(openMenuId === id ? null : id);
+  };
+
+  const handleDeleteConfirm = (id: string, name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
+      handleDelete(id);
+    }
+    setOpenMenuId(null);
+  };
+
   const openFilePicker = () => fileInputRef.current?.click();
   const addRecentUploads = async (files: File[]) => {
-    await fileService.upload(files);
+    const uploaded = await fileService.upload(files);
+    const persisted = await Promise.all(uploaded.map(toRecentUpload));
+    setRecentUploads((current) => [...persisted, ...current]);
+    setIsUploadModalOpen(false);
+    return;
     setRecentUploads((current) => [
       ...files.map((file) => ({
         id: `${file.name}-${file.lastModified}-${file.size}-${Date.now()}`,
@@ -143,11 +189,13 @@ const Dashboard = ({ recentUploads, setRecentUploads }: DashboardProps) => {
               <StoredPhotos
                 photos={visibleUploads.filter((file): file is RecentUpload & { type: "Photos" } => file.type === "Photos")}
                 onUploadClick={() => setIsUploadModalOpen(true)}
+                onDelete={handleDelete}
               />
             ) : currentView === "Files" ? (
               <StoredFiles
                 files={visibleUploads.filter((file): file is RecentUpload & { type: "Files" } => file.type === "Files")}
                 onUploadClick={() => setIsUploadModalOpen(true)}
+                onDelete={handleDelete}
               />
             ) : (
               <div className="upload-list">
@@ -161,7 +209,24 @@ const Dashboard = ({ recentUploads, setRecentUploads }: DashboardProps) => {
                         <h2>{file.name}</h2>
                         <p>{file.meta}</p>
                       </div>
-                      <button className="more-button" aria-label={`More options for ${file.name}`}><FaEllipsisVertical /></button>
+                      <button
+                        className="more-button"
+                        aria-label={`More options for ${file.name}`}
+                        onClick={() => handleMenuToggle(file.id)}
+                      >
+                        <FaEllipsisVertical />
+                      </button>
+                      {openMenuId === file.id && (
+                        <div className="dropdown-menu" role="menu">
+                          <button
+                            className="dropdown-menu-item delete-item"
+                            role="menuitem"
+                            onClick={(e) => handleDeleteConfirm(file.id, file.name, e)}
+                          >
+                            <FaTrash /> Delete
+                          </button>
+                        </div>
+                      )}
                     </article>
                   ))
                 ) : (
